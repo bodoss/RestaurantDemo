@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -24,11 +26,26 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.coroutinescore
+    implementation deps.kotlin.coroutinesandroid
+
+    implementation deps.gson
+    implementation deps.timber
+    implementation deps.room.runtime
+    implementation deps.lifecycle.runtime
+    kapt deps.lifecycle.compiler
+    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.lifecycle.livedata_ktx
+
+    implementation deps.support.app_compat
+    implementation deps.support.core_ktx
+    implementation deps.support.constraint_layout
+    implementation deps.support.recyclerview
+    implementation deps.support.cardview
+    implementation deps.activity.activity_ktx
+    kapt deps.room.compiler
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

@@ -1,0 +1,53 @@
+ext.deps = [:]
+def versions = [:]
+versions.activity = '1.0.0'
+versions.fragment = "1.2.0-rc01"
+versions.support = "1.0.0"
+versions.appcompat = "1.1.0"
+versions.timber = "4.7.1"
+versions.gson = "2.8.6"
+versions.lifecycle = "2.2.0-rc01"
+versions.room = "2.1.0-rc01"
+versions.kotlin = '1.3.61'
+versions.core_ktx = "1.0.2"
+versions.constraint_layout = "2.0.0-beta1"
+ext.versions = versions
+
+def deps = [:]
+
+def kotlin = [:]
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin"
+kotlin.coroutinescore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+kotlin.coroutinesandroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+deps.kotlin = kotlin
+
+def support = [:]
+support.app_compat = "androidx.appcompat:appcompat:$versions.appcompat"
+support.recyclerview = "androidx.recyclerview:recyclerview:$versions.support"
+support.cardview = "androidx.cardview:cardview:$versions.support"
+support.core_ktx = "androidx.core:core-ktx:$versions.core_ktx"
+support.constraint_layout = "androidx.constraintlayout:constraintlayout:$versions.constraint_layout"
+deps.support = support
+
+def room = [:]
+room.runtime = "androidx.room:room-runtime:$versions.room"
+room.compiler = "androidx.room:room-compiler:$versions.room"
+deps.room = room
+
+def lifecycle = [:]
+lifecycle.runtime = "androidx.lifecycle:lifecycle-runtime:$versions.lifecycle"
+lifecycle.compiler = "androidx.lifecycle:lifecycle-compiler:$versions.lifecycle"
+lifecycle.viewmodel_ktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"
+lifecycle.livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
+deps.lifecycle = lifecycle
+
+def activity = [:]
+activity.activity_ktx = "androidx.activity:activity-ktx:$versions.activity"
+deps.activity = activity
+
+deps.timber = "com.jakewharton.timber:timber:$versions.timber"
+deps.gson = "com.google.code.gson:gson:$versions.gson"
+
+
+ext.deps = deps
+
