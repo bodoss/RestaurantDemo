@@ -46,3 +46,15 @@ data class Restaurant(
         return result
     }
 }
+
+fun String?.toOpenState(): OpenState {
+    return when (this) {
+        "open" -> OpenState.OPEN
+        "order ahead" -> OpenState.ORDER_AHED
+        else -> OpenState.CLOSED
+    }
+}
+
+enum class OpenState {
+    OPEN, ORDER_AHED, CLOSED
+}

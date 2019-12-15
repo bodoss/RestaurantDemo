@@ -1,10 +1,13 @@
 package com.bodoss.restaurantdemo.ui
 
 
+import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
@@ -15,9 +18,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bodoss.restaurantdemo.Injector
+import com.bodoss.restaurantdemo.data.MinCostSortOption
 import com.bodoss.restaurantdemo.data.Restaurant
+import com.bodoss.restaurantdemo.data.SortOption
+import com.bodoss.restaurantdemo.data.toOpenState
 import com.bodoss.restaurantdemo.databinding.FragmentRestaurantListBinding
 import com.bodoss.restaurantdemo.repo.RestaurantsRepository
+
 
 class RestaurantListFragment : Fragment() {
 
@@ -41,6 +48,28 @@ class RestaurantListFragment : Fragment() {
             adapter = vm.adapter
         }
         vm.observe(viewLifecycleOwner)
+
+        val spinnerArray = SortOption.sortMap.keys.toTypedArray()
+        val spinnerArrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter<String>(activity!!, R.layout.simple_spinner_item, spinnerArray)
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+        bind.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                SortOption.sortMap[spinnerArray[position]]?.let {
+                    vm.sortOption = it
+                }
+            }
+        }
+        bind.spinner.adapter = spinnerArrayAdapter
     }
 
 }
@@ -52,6 +81,11 @@ class RestaurantsVM : ViewModel() {
 
     private var latestData = ArrayList<Restaurant>()
     private var filterVal = ""
+    var sortOption: SortOption = SortOption.sortMap["deliveryCosts"] ?: MinCostSortOption()
+        set(value) {
+            field = value
+            setNewData()
+        }
 
 
     init {
@@ -87,12 +121,22 @@ class RestaurantsVM : ViewModel() {
         val r = ArrayList<Restaurant>()
         val list = latestData.filter { it.name?.contains(filterVal, true) == true }
         val res = list.groupBy { it.favourite }
-        res[true]?.let {
-            r.addAll(it.sortedBy { it.name })
+        res[true]?.let { favs ->
+            favs.groupBy { it.status }.entries.sortedBy { it.key?.toOpenState() }.forEach { e ->
+                r.addAll(sortOption.sort(e.value))
+            }
         }
-        res[false]?.let {
-            r.addAll(it.sortedBy { it.name })
+        res[false]?.let { other ->
+            other.groupBy { it.status }.entries.sortedBy { it.key?.toOpenState() }.forEach { e ->
+                r.addAll(sortOption.sort(e.value))
+            }
         }
-        adapter.submitList(r)
+        adapter.submitList(r.map {
+            RestaurantWrap(
+                it,
+                sortOption.sortOption,
+                sortOption.getSortVal(it)
+            )
+        })
     }
 }

@@ -11,13 +11,15 @@ import java.util.concurrent.Executors
 
 val diskIO: ExecutorService = Executors.newSingleThreadExecutor()
 
-class RestaurantsAdapter : DataBoundListAdapter<Restaurant, RestaurantItemBinding>(diskIO,
-    object : DiffUtil.ItemCallback<Restaurant>() {
-        override fun areItemsTheSame(oldItem: Restaurant, newItem: Restaurant): Boolean {
-            return oldItem.id == newItem.id
+data class RestaurantWrap(val restaurant: Restaurant, val sort: String, val sortVal: Float)
+
+class RestaurantsAdapter : DataBoundListAdapter<RestaurantWrap, RestaurantItemBinding>(diskIO,
+    object : DiffUtil.ItemCallback<RestaurantWrap>() {
+        override fun areItemsTheSame(oldItem: RestaurantWrap, newItem: RestaurantWrap): Boolean {
+            return oldItem.restaurant.id == newItem.restaurant.id
         }
 
-        override fun areContentsTheSame(oldItem: Restaurant, newItem: Restaurant): Boolean {
+        override fun areContentsTheSame(oldItem: RestaurantWrap, newItem: RestaurantWrap): Boolean {
             return oldItem == newItem
         }
     }) {
@@ -27,10 +29,10 @@ class RestaurantsAdapter : DataBoundListAdapter<Restaurant, RestaurantItemBindin
         return RestaurantItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bind(binding: RestaurantItemBinding, item: Restaurant) {
+    override fun bind(binding: RestaurantItemBinding, item: RestaurantWrap) {
         binding.item = item
         binding.favBtn.setOnClickListener {
-            favChanged?.invoke(item, !item.favourite)
+            favChanged?.invoke(item.restaurant, !item.restaurant.favourite)
         }
     }
 }
