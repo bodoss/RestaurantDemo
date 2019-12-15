@@ -3,6 +3,8 @@ package com.bodoss.restaurantdemo.repo
 import androidx.lifecycle.LiveData
 import com.bodoss.restaurantdemo.data.Restaurant
 import com.bodoss.restaurantdemo.data.db.RestaurantDao
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 interface RestaurantsRepository {
     fun getAllRestaurants(): LiveData<List<Restaurant>>
@@ -16,6 +18,8 @@ class RestaurantRepoImpl(val dao: RestaurantDao) : RestaurantsRepository {
     }
 
     override fun updateRestaurant(item: Restaurant) {
-        dao.insert(item)
+        GlobalScope.launch {
+            dao.insert(item)
+        }
     }
 }

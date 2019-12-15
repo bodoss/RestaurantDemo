@@ -23,6 +23,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
 }
 
 dependencies {
@@ -34,6 +45,7 @@ dependencies {
     implementation deps.timber
     implementation deps.room.runtime
     implementation deps.lifecycle.runtime
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt deps.lifecycle.compiler
     implementation deps.lifecycle.viewmodel_ktx
     implementation deps.lifecycle.livedata_ktx
@@ -42,8 +54,14 @@ dependencies {
     implementation deps.support.core_ktx
     implementation deps.support.constraint_layout
     implementation deps.support.recyclerview
+
+    implementation deps.support.fragment_ktx
+    implementation deps.support.navigation_fragment
+    implementation deps.support.navigation_ui
+
     implementation deps.support.cardview
     implementation deps.activity.activity_ktx
+
     kapt deps.room.compiler
 
     testImplementation 'junit:junit:4.12'
