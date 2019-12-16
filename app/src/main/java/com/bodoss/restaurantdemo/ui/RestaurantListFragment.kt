@@ -12,10 +12,7 @@ import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bodoss.restaurantdemo.Injector
 import com.bodoss.restaurantdemo.data.MinCostSortOption
@@ -28,7 +25,14 @@ import com.bodoss.restaurantdemo.repo.RestaurantsRepository
 
 class RestaurantListFragment : Fragment() {
 
-    val vm by activityViewModels<RestaurantsVM>()
+    private val factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return RestaurantsVM(Injector.getRestaurantsRepo()) as T
+        }
+    }
+
+    val vm by activityViewModels<RestaurantsVM> { factory }
+
     lateinit var bind: FragmentRestaurantListBinding
 
     override fun onCreateView(
@@ -74,8 +78,8 @@ class RestaurantListFragment : Fragment() {
 
 }
 
-class RestaurantsVM : ViewModel() {
-    val repo: RestaurantsRepository
+class RestaurantsVM(val repo: RestaurantsRepository) : ViewModel() {
+
     val adapter = RestaurantsAdapter()
     val filter = ObservableField<String>()
 
@@ -89,7 +93,7 @@ class RestaurantsVM : ViewModel() {
 
 
     init {
-        repo = Injector.getRestaurantsRepo()
+//        repo = Injector.getRestaurantsRepo()
         adapter.favChanged = { r, fav ->
             repo.updateRestaurant(Restaurant(r.id, r.sortingValues, r.name, r.status, fav))
         }
