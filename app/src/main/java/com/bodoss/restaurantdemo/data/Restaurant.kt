@@ -20,7 +20,7 @@ data class Restaurant(
     @field:SerializedName("status")
     val status: String? = null,
 
-    val favourite: Boolean
+    val favourite: Boolean = false
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

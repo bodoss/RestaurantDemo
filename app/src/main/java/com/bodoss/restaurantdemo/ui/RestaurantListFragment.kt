@@ -44,14 +44,19 @@ class RestaurantListFragment : Fragment() {
         return bind.root
     }
 
+    private val restAdapter: RestaurantsAdapter = RestaurantsAdapter()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bind.vm = vm
         bind.rv.run {
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-            adapter = vm.adapter
+            adapter = restAdapter
         }
-        vm.observe(viewLifecycleOwner)
+        restAdapter.favChanged = vm.favChanged
+        vm.getListData().observe(viewLifecycleOwner) {
+            restAdapter.submitList(it)
+        }
 
         val spinnerArray = SortOption.sortMap.keys.toTypedArray()
         val spinnerArrayAdapter: ArrayAdapter<String> =
@@ -78,23 +83,25 @@ class RestaurantListFragment : Fragment() {
 
 }
 
-class RestaurantsVM(val repo: RestaurantsRepository) : ViewModel() {
-
-    val adapter = RestaurantsAdapter()
+class RestaurantsVM(
+    private val repo: RestaurantsRepository
+) : ViewModel() {
     val filter = ObservableField<String>()
 
     private var latestData = ArrayList<Restaurant>()
     private var filterVal = ""
+    private val listLiveData = MutableLiveData<List<RestaurantWrap>>()
+
     var sortOption: SortOption = SortOption.sortMap["deliveryCosts"] ?: MinCostSortOption()
         set(value) {
             field = value
             setNewData()
         }
 
+    val favChanged: ((r: Restaurant, fav: Boolean) -> Unit)
 
     init {
-//        repo = Injector.getRestaurantsRepo()
-        adapter.favChanged = { r, fav ->
+        favChanged = { r, fav ->
             repo.updateRestaurant(Restaurant(r.id, r.sortingValues, r.name, r.status, fav))
         }
         filter.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
@@ -111,14 +118,17 @@ class RestaurantsVM(val repo: RestaurantsRepository) : ViewModel() {
         return repo.getAllRestaurants()
     }
 
-    fun observe(lifecycleOwner: LifecycleOwner) {
-        getRestaurants().observe(lifecycleOwner, Observer { setNewListData(it) })
-    }
-
     private fun setNewListData(data: List<Restaurant>) {
         latestData.clear()
         latestData.addAll(data)
         setNewData()
+    }
+
+    fun getListData(): LiveData<List<RestaurantWrap>> {
+        return Transformations.switchMap(getRestaurants()) {
+            setNewListData(it)
+            listLiveData
+        }
     }
 
     private fun setNewData() {
@@ -135,7 +145,8 @@ class RestaurantsVM(val repo: RestaurantsRepository) : ViewModel() {
                 r.addAll(sortOption.sort(e.value))
             }
         }
-        adapter.submitList(r.map {
+
+        listLiveData.postValue(r.map {
             RestaurantWrap(
                 it,
                 sortOption.sortOption,

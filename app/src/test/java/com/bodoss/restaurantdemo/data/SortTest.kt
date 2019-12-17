@@ -27,7 +27,7 @@ class SortTest {
     var mockitoRule = MockitoJUnit.rule()
 
     @Before
-    fun before() {
+    fun init() {
         `when`(r1.sortingValues).thenReturn(v1)
         `when`(r2.sortingValues).thenReturn(v2)
     }
