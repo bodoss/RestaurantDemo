@@ -1,3 +1,5 @@
+RestaurantDemo is a sample project demonstrating mvvm approach with using lifecycle, livedata, room, viewmodel, repository, databinding
+
 # Requirements
 Android SDK
 
