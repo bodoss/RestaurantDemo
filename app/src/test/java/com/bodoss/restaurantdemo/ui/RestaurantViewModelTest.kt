@@ -46,4 +46,12 @@ class RestaurantViewModelTest {
         restRes.postValue(list)
         verify(observer).onChanged(list)
     }
+
+    @Test
+    fun favouriteTest() {
+        val rest = Restaurant(3, name = "name")
+        vm.favChanged.invoke(rest, true)
+        verify(repo).updateRestaurant(rest)
+    }
+
 }
